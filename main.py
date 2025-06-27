@@ -5,6 +5,8 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import filedialog
 
+from life_logic import step, save_life_grid
+
 # CONSTANTS
 GRID_SIZE = (100, 100)
 PIXEL_SIZE = 20
@@ -50,11 +52,6 @@ def update_grid(grid: np.array, click_pos: tuple, button: int):
     else:
         raise ValueError("How tf did we get here brother?")
     
-def save_life_array(array, prefix="life"):
-    timestamp = datetime.now().strftime("%H-%M-%S")
-    filename = f"./{prefix}_{timestamp}.npy"
-    np.save(filename, array)
-    print(f"Saved: {filename}")
 
 def open_file_dialog():
     file_path = filedialog.askopenfilename(
@@ -65,47 +62,6 @@ def open_file_dialog():
         print("Selected file:", file_path)
     return file_path
     
-def step(grid: np.array) -> np.array:
-    """
-    Create next grid frame with Conways rules
-    """
-    next_step = grid.copy()
-
-    cell_neighbors = [
-        (-1, -1), (-1, 0), (-1, +1),
-        ( 0, -1),          ( 0, +1),
-        (+1, -1), (+1, 0), (+1, +1)
-    ]
-
-    # Loop through initial state cells
-    for y, x in np.ndindex(grid.shape):
-        neighbor_count = 0
-
-        for dy, dx in cell_neighbors:
-            # Get neighbor coordinates (With wraparound from modulo)
-            ny = (y + dy) % grid.shape[0]
-            nx = (x + dx) % grid.shape[1]
-            
-            # Accumulate neighbor counts
-            if grid[(ny, nx)] == True:
-                neighbor_count += 1
-
-        if grid[(y, x)] == True:
-            if neighbor_count < 2:
-                # Underpopulation
-                next_step[(y, x)] = False
-            elif neighbor_count == 2 or neighbor_count == 3:
-                # Survival
-                next_step[(y, x)] = True
-            elif neighbor_count > 3:
-                # Overpopulation
-                next_step[(y,x)] = False
-        else:
-            if neighbor_count == 3:
-                # Reproduction
-                next_step[(y,x)] = True
-
-    return next_step
 
 if __name__ == '__main__':
     # Hide the main tkinter window
@@ -161,7 +117,7 @@ if __name__ == '__main__':
                     grid = step(grid=grid)
 
                 elif event.key == pygame.K_s:
-                    save_life_array(array=grid)
+                    save_life_grid(array=grid)
 
                 elif event.key == pygame.K_o:
                     selected_file = open_file_dialog()

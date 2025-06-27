@@ -7,13 +7,14 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import filedialog
 
-from life_logic import step, save_life_grid
-from life_input import update_grid, open_file_dialog
-from life_display import setup_display, draw_grid
+from life_logic import *
+from life_input import *
+from life_display import *
 
 # CONSTANTS
-GRID_SIZE = (25, 25)
-PIXEL_SIZE = 20
+grid_space = 30
+GRID_SIZE = (grid_space, grid_space)
+PIXEL_SIZE = 60
 
 if __name__ == "__main__":
     # Hide the main tkinter window (Only used for file dialog)
@@ -22,6 +23,10 @@ if __name__ == "__main__":
 
     # Setup screen size
     screen = setup_display(grid_size=GRID_SIZE, pixel_size=PIXEL_SIZE)
+    
+    # Bloom settings
+    glow_radius = int(PIXEL_SIZE * 2.5)
+    glow_surf = create_glow_surface(glow_radius, max_alpha=40)
 
     # Main loop
     grid = np.zeros(GRID_SIZE, dtype=bool)
@@ -50,7 +55,7 @@ if __name__ == "__main__":
                     update_grid(
                         grid=grid,
                         pixel_size=PIXEL_SIZE,
-                        lick_pos=event.pos,
+                        click_pos=event.pos,
                         button_clicked=event.button,
                     )
 
@@ -90,10 +95,11 @@ if __name__ == "__main__":
 
                 # Save current setup with 's' key
                 elif event.key == pygame.K_s:
-                    save_life_grid(array=grid)
+                    save_life_grid(grid=grid)
 
                 # Open saved file with 'o' key
                 elif event.key == pygame.K_o:
+                    playing = False
                     selected_file = open_file_dialog()
                     grid = np.load(selected_file)
 
@@ -105,4 +111,5 @@ if __name__ == "__main__":
             grid = step(grid=grid)
             time.sleep(0.05)
 
-        draw_grid(grid=grid, pixel_size=PIXEL_SIZE, screen=screen)
+        draw_grid(grid=grid, pixel_size=PIXEL_SIZE, screen=screen, glow_surf=glow_surf)
+        pygame.display.flip()

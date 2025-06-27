@@ -2,6 +2,7 @@
 
 from tkinter import filedialog
 import numpy as np
+from datetime import datetime
 
 def update_grid(grid: np.ndarray, pixel_size: int, click_pos: tuple, button_clicked: int):
     """
@@ -30,3 +31,12 @@ def open_file_dialog():
     if file_path:
         print("Selected file:", file_path)
     return file_path
+
+def save_life_grid(grid: np.ndarray, prefix="life"):
+    """
+    Save current grid setup to timestamped .npy file.
+    """
+    timestamp = datetime.now().strftime("%H-%M-%S")
+    filename = f"./{prefix}_{timestamp}.npy"
+    np.save(filename, grid)
+    print(f"Saved: {filename}")

@@ -1,7 +1,6 @@
 # life_logic.py
 
 import numpy as np
-from datetime import datetime
 
 def step(grid: np.ndarray) -> np.ndarray:
     """
@@ -27,12 +26,3 @@ def step(grid: np.ndarray) -> np.ndarray:
             next_step[y, x] = (neighbors == 3)  # Only way for new cells to emerge
 
     return next_step
-
-def save_life_grid(grid: np.ndarray, prefix="life"):
-    """
-    Save current grid setup to timestamped .npy file.
-    """
-    timestamp = datetime.now().strftime("%H-%M-%S")
-    filename = f"./{prefix}_{timestamp}.npy"
-    np.save(filename, grid)
-    print(f"Saved: {filename}")

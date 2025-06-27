@@ -1,18 +1,21 @@
 import numpy as np
 import pygame
 import time
+from datetime import datetime
+import tkinter as tk
+from tkinter import filedialog
 
 # CONSTANTS
-GRID_SIZE = (50, 50)
+GRID_SIZE = (100, 100)
 PIXEL_SIZE = 20
 
 def setup_display():
     """
     Create window with PyGame and do first display.
     """
-    bg_color = (0,0,0)
+    bg_color = (60,60,60)
     screen = pygame.display.set_mode(tuple(x * PIXEL_SIZE for x in GRID_SIZE))
-    pygame.display.set_caption("Hello there!")
+    pygame.display.set_caption("The Game of Life!")
     screen.fill(bg_color)
     pygame.display.flip()
     return screen
@@ -27,7 +30,7 @@ def draw_grid(grid: np.array, screen: pygame.display):
         color = (255, 255, 255) if pixel_value else (0, 0, 0)
 
         # Create rect object
-        rect = pygame.Rect(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
+        rect = pygame.Rect(x*PIXEL_SIZE+2, y*PIXEL_SIZE+2, PIXEL_SIZE-2, PIXEL_SIZE-2)
         pygame.draw.rect(surface=screen, color=color, rect=rect)        
 
     pygame.display.flip()
@@ -46,6 +49,21 @@ def update_grid(grid: np.array, click_pos: tuple, button: int):
         grid[grid_space] = False
     else:
         raise ValueError("How tf did we get here brother?")
+    
+def save_life_array(array, prefix="life"):
+    timestamp = datetime.now().strftime("%H-%M-%S")
+    filename = f"./{prefix}_{timestamp}.npy"
+    np.save(filename, array)
+    print(f"Saved: {filename}")
+
+def open_file_dialog():
+    file_path = filedialog.askopenfilename(
+        title="Select Life Setup",
+        filetypes=[("NumPy Files", "*.npy"), ("All Files", "*.*")]
+    )
+    if file_path:
+        print("Selected file:", file_path)
+    return file_path
     
 def step(grid: np.array) -> np.array:
     """
@@ -90,6 +108,10 @@ def step(grid: np.array) -> np.array:
     return next_step
 
 if __name__ == '__main__':
+    # Hide the main tkinter window
+    root = tk.Tk()
+    root.withdraw()
+
     # Setup screen size    
     screen = setup_display()
 
@@ -135,12 +157,22 @@ if __name__ == '__main__':
                     playing ^= True
                     print(f"Playing bool is set to: {playing}")
 
-                if event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT:
                     grid = step(grid=grid)
 
+                elif event.key == pygame.K_s:
+                    save_life_array(array=grid)
+
+                elif event.key == pygame.K_o:
+                    selected_file = open_file_dialog()
+                    grid = np.load(selected_file)
+
+                elif event.key == pygame.K_r:
+                    grid.fill(False)
+                    
         if playing:
             grid = step(grid=grid)
-            time.sleep(0.2)
+            time.sleep(0.01)
 
         draw_grid(grid=grid, screen=screen)
         

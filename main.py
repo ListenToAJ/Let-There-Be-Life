@@ -31,6 +31,17 @@ def draw_grid(grid: np.array, screen: pygame.display):
 
     pygame.display.flip()
 
+def update_grid(grid: np.array, click_pos: tuple, button: int):
+    # Convert click pos coords to grid space coords
+    grid_space = tuple(x // PIXEL_SIZE for x in click_pos)
+
+    if button == 1:
+        grid[grid_space] = True
+    elif button == 3:
+        grid[grid_space] = False
+    else:
+        raise ValueError("How tf did we get here brother?")
+
 if __name__ == '__main__':
     # Setup screen size    
     screen = setup_display()
@@ -40,15 +51,35 @@ if __name__ == '__main__':
 
     # Main loop
     running = True
+    dragging_left = False
+    dragging_right = False
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            # Mouse down event
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                click_pos = tuple(reversed(event.pos))
-                print(f"Mouse clicked at: {click_pos}")
-                grid_space = tuple(x // PIXEL_SIZE for x in click_pos)
-                print(f"Grid space clicked is: {grid_space}")
-                grid[grid_space] = True
-                draw_grid(grid=grid, screen=screen)
+                if event.button == 1:
+                    dragging_left = True
+                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=event.button)
+                if event.button == 3:
+                    dragging_right = True
+                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=event.button)
+            # Mouse up event
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    dragging_left = False
+                if event.button == 3:
+                    dragging_right = False
+            # Mouse drag event
+            elif event.type == pygame.MOUSEMOTION:
+                if dragging_left:
+                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=1)
+                if dragging_right:
+                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=3)
+
+            draw_grid(grid=grid, screen=screen)
+
+
         

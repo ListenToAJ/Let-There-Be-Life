@@ -8,7 +8,8 @@ def update_grid(grid: np.ndarray, pixel_size: int, click_pos: tuple, button_clic
     Take a mouse input and update grid based on it.
     """
     # Convert clicked coords to grid location
-    y, x = (coord // pixel_size for coord in reversed(click_pos))
+    y = min(max(click_pos[1] // pixel_size, 0), grid.shape[0] - 1)
+    x = min(max(click_pos[0] // pixel_size, 0), grid.shape[1] - 1)
 
     # Draw and erase
     if button_clicked == 1:

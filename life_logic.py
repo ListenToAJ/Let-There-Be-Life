@@ -3,7 +3,7 @@
 import numpy as np
 from datetime import datetime
 
-def step(grid: np.array) -> np.array:
+def step(grid: np.ndarray) -> np.ndarray:
     """
     Apply Conway's Game of Life rules and return next generation grid.
     """
@@ -28,7 +28,7 @@ def step(grid: np.array) -> np.array:
 
     return next_step
 
-def save_life_grid(grid: np.array, prefix="life"):
+def save_life_grid(grid: np.ndarray, prefix="life"):
     """
     Save current grid setup to timestamped .npy file.
     """

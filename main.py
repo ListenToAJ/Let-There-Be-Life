@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import filedialog
 
 from life_logic import step, save_life_grid
+from life_input import update_grid, open_file_dialog
 
 # CONSTANTS
 GRID_SIZE = (100, 100)
@@ -37,38 +38,38 @@ def draw_grid(grid: np.array, screen: pygame.display):
 
     pygame.display.flip()
 
-def update_grid(grid: np.array, click_pos: tuple, button: int):
-    """
-    Take click pos and button click and modify grid.
-    """
-    # Convert click pos coords to grid space coords
-    grid_space = tuple(x // PIXEL_SIZE for x in click_pos)
+# def update_grid(grid: np.array, click_pos: tuple, button: int):
+#     """
+#     Take click pos and button click and modify grid.
+#     """
+#     # Convert click pos coords to grid space coords
+#     grid_space = tuple(x // PIXEL_SIZE for x in click_pos)
 
-    # Click conditional
-    if button == 1:
-        grid[grid_space] = True
-    elif button == 3:
-        grid[grid_space] = False
-    else:
-        raise ValueError("How tf did we get here brother?")
-    
+#     # Click conditional
+#     if button == 1:
+#         grid[grid_space] = True
+#     elif button == 3:
+#         grid[grid_space] = False
+#     else:
+#         raise ValueError("How tf did we get here brother?")
 
-def open_file_dialog():
-    file_path = filedialog.askopenfilename(
-        title="Select Life Setup",
-        filetypes=[("NumPy Files", "*.npy"), ("All Files", "*.*")]
-    )
-    if file_path:
-        print("Selected file:", file_path)
-    return file_path
-    
+
+# def open_file_dialog():
+#     file_path = filedialog.askopenfilename(
+#         title="Select Life Setup",
+#         filetypes=[("NumPy Files", "*.npy"), ("All Files", "*.*")]
+#     )
+#     if file_path:
+#         print("Selected file:", file_path)
+#     return file_path
+
 
 if __name__ == '__main__':
     # Hide the main tkinter window
     root = tk.Tk()
     root.withdraw()
 
-    # Setup screen size    
+    # Setup screen size
     screen = setup_display()
 
     # Create and draw grid
@@ -89,10 +90,15 @@ if __name__ == '__main__':
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     dragging_left = True
-                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=event.button)
+                    update_grid(grid=grid, pixel_size=PIXEL_SIZE, click_pos=event.pos, button_clicked=event.button)
                 if event.button == 3:
                     dragging_right = True
-                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=event.button)
+                    update_grid(
+                        grid=grid,
+                        pixel_size=PIXEL_SIZE,
+                        lick_pos=event.pos,
+                        button_clicked=event.button,
+                    )
 
             # Mouse up event
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -104,9 +110,19 @@ if __name__ == '__main__':
             # Mouse drag event
             elif event.type == pygame.MOUSEMOTION:
                 if dragging_left:
-                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=1)
+                    update_grid(
+                        grid=grid,
+                        pixel_size=PIXEL_SIZE,
+                        click_pos=event.pos,
+                        button_clicked=1,
+                    )
                 if dragging_right:
-                    update_grid(grid=grid, click_pos=tuple(reversed(event.pos)), button=3)
+                    update_grid(
+                        grid=grid,
+                        pixel_size=PIXEL_SIZE,
+                        click_pos=event.pos,
+                        button_clicked=3,
+                    )
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
@@ -125,10 +141,9 @@ if __name__ == '__main__':
 
                 elif event.key == pygame.K_r:
                     grid.fill(False)
-                    
+
         if playing:
             grid = step(grid=grid)
             time.sleep(0.01)
 
         draw_grid(grid=grid, screen=screen)
-        

@@ -16,8 +16,8 @@ grid_space = 30
 GRID_SIZE = (grid_space, grid_space)
 PIXEL_SIZE = 60
 
-if __name__ == "__main__":
-    # Hide the main tkinter window (Only used for file dialog)
+def run_game():
+        # Hide the main tkinter window (Only used for file dialog)
     root = tk.Tk()
     root.withdraw()
 
@@ -113,3 +113,6 @@ if __name__ == "__main__":
 
         draw_grid(grid=grid, pixel_size=PIXEL_SIZE, screen=screen, glow_surf=glow_surf)
         pygame.display.flip()
+
+if __name__ == "__main__":
+    run_game()

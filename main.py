@@ -1,3 +1,5 @@
+# main.py
+
 import numpy as np
 import pygame
 import time
@@ -7,62 +9,11 @@ from tkinter import filedialog
 
 from life_logic import step, save_life_grid
 from life_input import update_grid, open_file_dialog
+from life_display import setup_display, draw_grid
 
 # CONSTANTS
 GRID_SIZE = (100, 100)
 PIXEL_SIZE = 20
-
-def setup_display():
-    """
-    Create window with PyGame and do first display.
-    """
-    bg_color = (60,60,60)
-    screen = pygame.display.set_mode(tuple(x * PIXEL_SIZE for x in GRID_SIZE))
-    pygame.display.set_caption("The Game of Life!")
-    screen.fill(bg_color)
-    pygame.display.flip()
-    return screen
-
-def draw_grid(grid: np.array, screen: pygame.display):
-    """
-    Pass 2d numpy array and draw it to screen (boolean values).
-    """
-    for y,x in np.ndindex(grid.shape):
-        # Get color for pixel value
-        pixel_value = grid[y, x]
-        color = (255, 255, 255) if pixel_value else (0, 0, 0)
-
-        # Create rect object
-        rect = pygame.Rect(x*PIXEL_SIZE+2, y*PIXEL_SIZE+2, PIXEL_SIZE-2, PIXEL_SIZE-2)
-        pygame.draw.rect(surface=screen, color=color, rect=rect)        
-
-    pygame.display.flip()
-
-# def update_grid(grid: np.array, click_pos: tuple, button: int):
-#     """
-#     Take click pos and button click and modify grid.
-#     """
-#     # Convert click pos coords to grid space coords
-#     grid_space = tuple(x // PIXEL_SIZE for x in click_pos)
-
-#     # Click conditional
-#     if button == 1:
-#         grid[grid_space] = True
-#     elif button == 3:
-#         grid[grid_space] = False
-#     else:
-#         raise ValueError("How tf did we get here brother?")
-
-
-# def open_file_dialog():
-#     file_path = filedialog.askopenfilename(
-#         title="Select Life Setup",
-#         filetypes=[("NumPy Files", "*.npy"), ("All Files", "*.*")]
-#     )
-#     if file_path:
-#         print("Selected file:", file_path)
-#     return file_path
-
 
 if __name__ == '__main__':
     # Hide the main tkinter window
@@ -70,7 +21,7 @@ if __name__ == '__main__':
     root.withdraw()
 
     # Setup screen size
-    screen = setup_display()
+    screen = setup_display(grid_size=GRID_SIZE, pixel_size=PIXEL_SIZE)
 
     # Create and draw grid
     grid = np.zeros(GRID_SIZE, dtype=bool)
@@ -146,4 +97,4 @@ if __name__ == '__main__':
             grid = step(grid=grid)
             time.sleep(0.01)
 
-        draw_grid(grid=grid, screen=screen)
+        draw_grid(grid=grid, pixel_size=PIXEL_SIZE, screen=screen)

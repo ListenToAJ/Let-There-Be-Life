@@ -5,6 +5,8 @@
 __pycache__/
 saves/
 recordings/
+*.gif
+*.mp4
 
 # VSCode Settings
 .vscode/

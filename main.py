@@ -3,6 +3,7 @@
 import numpy as np
 import pygame
 import time
+import sys
 from datetime import datetime
 import tkinter as tk
 from tkinter import filedialog
@@ -12,8 +13,7 @@ from conways.life_input import *
 from conways.life_display import *
 
 # CONSTANTS
-grid_space = 30
-GRID_SIZE = (13, 65)
+GRID_SIZE = (30, 30)
 PIXEL_SIZE = 35
 
 def run_game():
@@ -32,6 +32,7 @@ def run_game():
     grid = np.zeros(GRID_SIZE, dtype=bool)
     running = True
     playing = False
+    recording = False
     dragging_left = False
     dragging_right = False
 
@@ -85,9 +86,16 @@ def run_game():
 
             elif event.type == pygame.KEYDOWN:
                 # Play / Pause with 'p' key
-                if event.key == pygame.K_p:
+                if event.key == pygame.K_p and not (event.mod & pygame.KMOD_SHIFT):
                     playing ^= True
                     print("Playing!") if playing else print("Paused!")
+
+                elif event.key == pygame.K_p and (event.mod & pygame.KMOD_SHIFT):
+                    # This one will be when shift + s is pressed
+                    playing ^= True
+                    recording ^= True
+                    print("Starting recording!") if recording else print("Stopping recording!")
+                    
 
                 # Do single step with '→' key
                 elif event.key == pygame.K_RIGHT:
@@ -100,15 +108,7 @@ def run_game():
                 # Open saved file with 'o' key
                 elif event.key == pygame.K_o:
                     playing = False
-                    selected_file = open_file_dialog()
-                    new_grid = np.load(selected_file)
-
-                    # Determine the overlapping region
-                    rows = min(grid.shape[0], new_grid.shape[0])
-                    cols = min(grid.shape[1], new_grid.shape[1])
-
-                    # Overwrite only the overlapping region
-                    grid[:rows, :cols] = new_grid[:rows, :cols]
+                    grid = load_in_file(grid=grid)
 
                 # Reset the board with 'r' key
                 elif event.key == pygame.K_r:
@@ -122,4 +122,12 @@ def run_game():
         pygame.display.flip()
 
 if __name__ == "__main__":
-    run_game()
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]
+        try:
+            np.load(file_path)
+            run_game()
+        except Exception as e:
+            print(f"An error occured: {e}")
+    else:
+        run_game()

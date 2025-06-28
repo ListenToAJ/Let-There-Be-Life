@@ -7,14 +7,14 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import filedialog
 
-from life_logic import *
-from life_input import *
-from life_display import *
+from conways.life_logic import *
+from conways.life_input import *
+from conways.life_display import *
 
 # CONSTANTS
 grid_space = 30
-GRID_SIZE = (grid_space, grid_space)
-PIXEL_SIZE = 60
+GRID_SIZE = (13, 65)
+PIXEL_SIZE = 35
 
 def run_game():
         # Hide the main tkinter window (Only used for file dialog)
@@ -101,7 +101,14 @@ def run_game():
                 elif event.key == pygame.K_o:
                     playing = False
                     selected_file = open_file_dialog()
-                    grid = np.load(selected_file)
+                    new_grid = np.load(selected_file)
+
+                    # Determine the overlapping region
+                    rows = min(grid.shape[0], new_grid.shape[0])
+                    cols = min(grid.shape[1], new_grid.shape[1])
+
+                    # Overwrite only the overlapping region
+                    grid[:rows, :cols] = new_grid[:rows, :cols]
 
                 # Reset the board with 'r' key
                 elif event.key == pygame.K_r:
@@ -109,7 +116,7 @@ def run_game():
 
         if playing:
             grid = step(grid=grid)
-            time.sleep(0.05)
+            time.sleep(0.04)
 
         draw_grid(grid=grid, pixel_size=PIXEL_SIZE, screen=screen, glow_surf=glow_surf)
         pygame.display.flip()

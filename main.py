@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog
 
 from conways.life_logic import *
-from conways.life_input import *
+from conways.life_input_output import *
 from conways.life_display import *
 
 # CONSTANTS
@@ -86,16 +86,28 @@ def run_game():
 
             elif event.type == pygame.KEYDOWN:
                 # Play / Pause with 'p' key
-                if event.key == pygame.K_p and not (event.mod & pygame.KMOD_SHIFT):
-                    playing ^= True
-                    print("Playing!") if playing else print("Paused!")
+                if event.key == pygame.K_p:
+                    if recording:
+                        # Stop recording on any 'p' or 'shift+p'
+                        recording = False
+                        playing = False
+                        print("Stopping recording\nPaused!")
 
-                elif event.key == pygame.K_p and (event.mod & pygame.KMOD_SHIFT):
-                    # This one will be when shift + s is pressed
-                    playing ^= True
-                    recording ^= True
-                    print("Starting recording!") if recording else print("Stopping recording!")
-                    
+                    else:
+                        # Check if shift is held down
+                        if event.mod & pygame.KMOD_SHIFT:
+                            # Start recording
+                            recording = True
+                            print("Starting recording!")
+
+                            if not os.path.exists("./recordings/.temp"):
+                                os.makedirs("./recordings/.temp")
+
+                        # Toggle playback
+                        playing ^= True
+                        print("Playing!" if playing else "Paused!")
+
+                        # After recording is stopped, stitch recording
 
                 # Do single step with '→' key
                 elif event.key == pygame.K_RIGHT:
@@ -103,6 +115,8 @@ def run_game():
 
                 # Save current setup with 's' key
                 elif event.key == pygame.K_s:
+                    if not os.path.exists("./saved"):
+                        os.makedirs("./saved")
                     save_life_grid(grid=grid)
 
                 # Open saved file with 'o' key

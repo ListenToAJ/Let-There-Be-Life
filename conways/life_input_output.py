@@ -1,8 +1,11 @@
 # life_input.py
 
+import os
+
 from tkinter import filedialog
 import numpy as np
 from datetime import datetime
+from typing import Literal
 
 def update_grid(grid: np.ndarray, pixel_size: int, click_pos: tuple, button_clicked: int):
     """
@@ -25,7 +28,7 @@ def save_life_grid(grid: np.ndarray, prefix="life"):
     Save current grid setup to timestamped .npy file.
     """
     timestamp = datetime.now().strftime("%H-%M-%S")
-    filename = f"./{prefix}_{timestamp}.npy"
+    filename = f"./saves/{prefix}_{timestamp}.npy"
     np.save(filename, grid)
     print(f"Saved: {filename}")
 
@@ -50,3 +53,8 @@ def load_in_file(grid: np.ndarray) -> np.ndarray:
     grid[:rows, :cols] = new_grid[:rows, :cols]
 
     return grid
+
+OutputFormat = Literal['gif', 'mp4']
+
+def stitch_recording(format: OutputFormat) -> None:
+    pass

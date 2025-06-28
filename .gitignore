@@ -1,8 +1,10 @@
 # Any temporary files
 *temp*
 
-# Any generated Python files
+# Any generated files
 __pycache__/
+saves/
+recordings/
 
 # VSCode Settings
 .vscode/

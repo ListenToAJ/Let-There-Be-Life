@@ -5,9 +5,13 @@ import os
 from tkinter import filedialog
 import numpy as np
 from datetime import datetime
+import subprocess
 from typing import Literal
 
-def update_grid(grid: np.ndarray, pixel_size: int, click_pos: tuple, button_clicked: int):
+
+def update_grid(
+    grid: np.ndarray, pixel_size: int, click_pos: tuple, button_clicked: int
+):
     """
     Take a mouse input and update grid based on it.
     """
@@ -18,10 +22,11 @@ def update_grid(grid: np.ndarray, pixel_size: int, click_pos: tuple, button_clic
     # Draw and erase
     if button_clicked == 1:
         grid[y, x] = True
-    elif button_clicked ==3:
+    elif button_clicked == 3:
         grid[y, x] = False
     else:
         raise ValueError("Unknown mouse button!")
+
 
 def save_life_grid(grid: np.ndarray, prefix="life"):
     """
@@ -31,6 +36,7 @@ def save_life_grid(grid: np.ndarray, prefix="life"):
     filename = f"./saves/{prefix}_{timestamp}.npy"
     np.save(filename, grid)
     print(f"Saved: {filename}")
+
 
 def load_in_file(grid: np.ndarray) -> np.ndarray:
     """
@@ -54,7 +60,54 @@ def load_in_file(grid: np.ndarray) -> np.ndarray:
 
     return grid
 
-OutputFormat = Literal['gif', 'mp4']
 
-def stitch_recording(format: OutputFormat) -> None:
-    pass
+OutputFormat = Literal["gif", "mp4"]
+
+
+def stitch_recording(
+    format: OutputFormat,
+    input_folder: str = "recordings/.temp",
+    fps: int = 15,
+):
+    input_pattern = f"{input_folder}/%05d.png"
+
+    if format == "gif":
+        output_file = f"recordings/output.gif"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                input_pattern,
+                "-filter_complex",
+                f"[0:v] fps={fps},split [a][b];[a] palettegen=stats_mode=diff [p];[b][p] paletteuse=dither=bayer",
+                output_file,
+            ],
+            check=True,
+        )
+
+    elif format == "mp4":
+        output_file = f"recordings/output.mp4"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-framerate",
+                str(fps),
+                "-i",
+                input_pattern,
+                "-c:v",
+                "libx264",
+                "-crf",
+                "23",  # lower = better quality, 18–28 is reasonable
+                "-preset",
+                "slow",  # slower = better compression
+                "-pix_fmt",
+                "yuv420p",
+                output_file,
+            ],
+            check=True,
+        )
+
+    else:
+        raise ValueError(f"Unsupported format: {format}")

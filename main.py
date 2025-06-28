@@ -2,6 +2,7 @@
 
 import numpy as np
 import pygame
+import shutil
 import time
 import sys
 from datetime import datetime
@@ -33,6 +34,7 @@ def run_game():
     running = True
     playing = False
     recording = False
+    frame_num = 0
     dragging_left = False
     dragging_right = False
 
@@ -91,7 +93,10 @@ def run_game():
                         # Stop recording on any 'p' or 'shift+p'
                         recording = False
                         playing = False
+                        frame_num = 0
                         print("Stopping recording\nPaused!")
+
+                        stitch_recording(format="gif")
 
                     else:
                         # Check if shift is held down
@@ -100,8 +105,14 @@ def run_game():
                             recording = True
                             print("Starting recording!")
 
-                            if not os.path.exists("./recordings/.temp"):
-                                os.makedirs("./recordings/.temp")
+                            temp_dir = "./recordings/.temp"
+
+                            # Remove the whole folder if it exists
+                            if os.path.exists(temp_dir):
+                                shutil.rmtree(temp_dir)
+
+                            # Recreate the folder
+                            os.makedirs(temp_dir)
 
                         # Toggle playback
                         playing ^= True
@@ -132,8 +143,14 @@ def run_game():
             grid = step(grid=grid)
             time.sleep(0.04)
 
+        if recording:
+            pygame.image.save(screen, f"./recordings/.temp/{frame_num:05}.png")
+            frame_num += 1
+        
         draw_grid(grid=grid, pixel_size=PIXEL_SIZE, screen=screen, glow_surf=glow_surf)
+
         pygame.display.flip()
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

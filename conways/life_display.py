@@ -42,7 +42,7 @@ def create_glow_surface(radius, color=(180, 180, 255), max_alpha=60):
 
     return glow_surf
 
-def draw_grid(grid: np.ndarray, pixel_size: int, screen, glow_surf):
+def draw_grid(grid: np.ndarray, pixel_size: int, screen: pygame.display, glow_surf):
     # Fill border color
     screen.fill(GRID_COLOR)
 

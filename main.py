@@ -18,7 +18,7 @@ GRID_SIZE = (30, 30)
 PIXEL_SIZE = 35
 
 def run_game():
-        # Hide the main tkinter window (Only used for file dialog)
+    # Hide the main tkinter window (Only used for file dialog)
     root = tk.Tk()
     root.withdraw()
 
@@ -126,8 +126,8 @@ def run_game():
 
                 # Save current setup with 's' key
                 elif event.key == pygame.K_s:
-                    if not os.path.exists("./saved"):
-                        os.makedirs("./saved")
+                    if not os.path.exists("./saves"):
+                        os.makedirs("./saves")
                     save_life_grid(grid=grid)
 
                 # Open saved file with 'o' key
